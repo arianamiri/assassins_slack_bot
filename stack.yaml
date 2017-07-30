@@ -111,7 +111,7 @@ Resources:
   PlayerLoaderFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: lambdas.load_players
+      Handler: lambdas.create_agents
       Runtime: python2.7
       CodeUri: ./target/
       Timeout: 60
