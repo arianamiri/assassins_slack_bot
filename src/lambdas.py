@@ -2,17 +2,20 @@ import logging
 
 import boto3
 
-import player_load
+from services import agent_management
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 
-def load_players(event, context):
+def create_agents(event, context):
     logger.info('LoadPlayers triggered')
     bucket = event['Records'][0]['s3']['bucket']['name']
     key = event['Records'][0]['s3']['object']['key']
 
-    player_load.load_players(bucket, key)
+    agent_management.create_agents(bucket, key)
 
     return key, bucket
+
+def reset_agents(event, context):
+    return agent_management.reset_agents()

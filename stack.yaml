@@ -92,7 +92,7 @@ Resources:
       VPCSecurityGroups:
         - !Ref DataStoreSecurityGroup
     DeletionPolicy: Snapshot
-  PlayerLoaderRole:
+  LambdaHandlerRole:
     Type: AWS::IAM::Role
     Properties:
       ManagedPolicyArns:
@@ -111,11 +111,11 @@ Resources:
   PlayerLoaderFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: lambdas.load_players
+      Handler: lambdas.create_agents
       Runtime: python2.7
       CodeUri: ./target/
       Timeout: 60
-      Role: !GetAtt PlayerLoaderRole.Arn
+      Role: !GetAtt LambdaHandlerRole.Arn
       Environment:
         Variables:
           DB_HOST: !GetAtt 'DataStore.Endpoint.Address'
@@ -129,3 +129,18 @@ Resources:
           Properties:
             Bucket: !Ref PlayerLoaderBucket
             Events: s3:ObjectCreated:*
+  PlayerRevivalFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambdas.reset_agents
+      Runtime: python2.7
+      CodeUri: ./target/
+      Timeout: 60
+      Role: !GetAtt LambdaHandlerRole.Arn
+      Environment:
+        Variables:
+          DB_HOST: !GetAtt 'DataStore.Endpoint.Address'
+          DB_PORT: !GetAtt 'DataStore.Endpoint.Port'
+          DB_NAME: assassins
+          DB_USERNAME: SpyMaster
+          DB_PASSWORD: IAmTheBagMan
