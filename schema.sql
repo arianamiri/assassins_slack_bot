@@ -17,7 +17,7 @@ CREATE TABLE `contracts` (
   `owner_id` int(11) NOT NULL,
   `target_id` int(11) NOT NULL,
   `bounty` int(11) NOT NULL,
-  `is_open` tinyint(4) NOT NULL DEFAULT '0',
+  `is_open` tinyint(4) NOT NULL DEFAULT '1',
   `is_successful` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `owner_target_unique` (`owner_id`,`target_id`),

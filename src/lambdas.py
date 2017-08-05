@@ -2,7 +2,7 @@ import logging
 
 import boto3
 
-from services import agent_management
+from services import agent_management, contract_management
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -18,4 +18,5 @@ def create_agents(event, context):
     return key, bucket
 
 def reset_agents(event, context):
-    return agent_management.reset_agents()
+    agent_management.reset_agents()
+    return contract_management.assign_contracts()
