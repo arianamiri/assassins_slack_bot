@@ -132,7 +132,7 @@ Resources:
   PlayerRevivalFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: lambdas.reset_players
+      Handler: lambdas.reset_agents
       Runtime: python2.7
       CodeUri: ./target/
       Timeout: 60

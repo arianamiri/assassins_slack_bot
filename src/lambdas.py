@@ -2,8 +2,7 @@ import logging
 
 import boto3
 
-import agent_management
-from services.code_name.generator import generate_codename
+from services import agent_management
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -18,5 +17,5 @@ def create_agents(event, context):
 
     return key, bucket
 
-def reset_players(event, context):
-    return generate_codename()
+def reset_agents(event, context):
+    return agent_management.reset_agents()
