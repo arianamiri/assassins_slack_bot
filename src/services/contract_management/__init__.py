@@ -24,8 +24,8 @@ def assign_contracts():
     # a new contract added against them.
     valid_target_lookup = _get_valid_targets()
 
-    # TODO figure out a way to make this vary
-    bounty = 1000
+    max_bounty = _get_max_bounty()
+
     contract_params = []
     for agent_id, possible_target_set in valid_target_lookup.iteritems():
         logger.info('assigning contract to %s', agent_id)
@@ -45,12 +45,30 @@ def assign_contracts():
             contract_params.append({
                 'target_id': target,
                 'agent_id': agent_id,
-                'bounty': bounty
+                'bounty': int(max_bounty * _get_bounty_modifier())
             })
             # book keeping for even distribution
             all_agent_ids.discard(target)
 
     data_access.assign_multiple_contracts(contract_params=contract_params)
 
+
 def _get_valid_targets():
     return data_access.get_available_targets_lookup()
+
+
+def _get_max_bounty():
+    """
+    The max bounty will 1.25x the existing bounty
+    """
+    existing_max = data_access.get_current_max_bounty()
+
+    if existing_max:
+        return int(1.25 * existing_max)
+
+    return 1000
+
+
+def _get_bounty_modifier():
+    modifiers = (.5, .75, 1)
+    return modifiers[random.randint(0, 2)]

@@ -28,3 +28,11 @@ def get_available_targets_lookup():
         agent_id: set(pt[1] for pt in possible_targets)
         for agent_id, possible_targets in groupby(results, key=lambda x: x[0])
     }
+
+
+def get_current_max_bounty():
+    with connection.cursor() as cursor:
+        cursor.execute(sql.GET_MAX_BOUNTY)
+        results = cursor.fetchone()
+
+    return results[0]

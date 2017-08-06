@@ -23,3 +23,8 @@ GET_AVAILABLE_TARGETS_FOR_ALL_AGENTS = """
            AND asignee.id != possible_targets.id
     ORDER BY asignee.id;
 """
+
+
+GET_MAX_BOUNTY = """
+    SELECT max(`bounty`) from `contracts`;
+"""
