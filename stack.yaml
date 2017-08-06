@@ -144,3 +144,25 @@ Resources:
           DB_NAME: assassins
           DB_USERNAME: SpyMaster
           DB_PASSWORD: IAmTheBagMan
+  CloseContractFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: gameplay_lambdas.close_contract
+      Runtime: python2.7
+      CodeUri: ./target/
+      Timeout: 60
+      Role: !GetAtt LambdaHandlerRole.Arn
+  CloseContractTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      DisplayName: 'Closed Contract Channel'
+      Subscription:
+        - Endpoint: !GetAtt CloseContractFunction.Arn
+          Protocol: 'lambda'
+  CloseContractPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      Principal: sns.amazonaws.com
+      SourceArn: !Ref CloseContractTopic
+      FunctionName: !GetAtt CloseContractFunction.Arn
