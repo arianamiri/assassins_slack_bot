@@ -26,7 +26,7 @@ def assign_contracts():
 
     # TODO figure out a way to make this vary
     bounty = 1000
-
+    contract_params = []
     for agent_id, possible_target_set in valid_target_lookup.iteritems():
         logger.info('assigning contract to %s', agent_id)
 
@@ -38,15 +38,19 @@ def assign_contracts():
         if not targets:
             targets = possible_targets_set
 
-        # grab random target
-        target = targets.pop()
+        if targets:
+            # grab random target
+            target = targets.pop()
 
-        logger.info('selected target: %s', target)
+            contract_params.append({
+                'target_id': target,
+                'agent_id': agent_id,
+                'bounty': bounty
+            })
+            # book keeping for even distribution
+            all_agent_ids.discard(target)
 
-        data_access.assign_contract(agent_id, target, bounty)
-
-        # book keeping for even distribution
-        all_agent_ids.discard(target)
+    data_access.assign_multiple_contracts(contract_params=contract_params)
 
 def _get_valid_targets():
     return data_access.get_available_targets_lookup()

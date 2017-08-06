@@ -13,6 +13,11 @@ def assign_contract(agent_id, target_id, bounty):
         })
     connection.commit()
 
+def assign_multiple_contracts(contract_params):
+    with connection.cursor() as cursor:
+        cursor.executemany(sql.ASSIGN_CONTRACT, args=contract_params)
+    connection.commit()
+
 
 def get_available_targets_lookup():
     with connection.cursor() as cursor:
