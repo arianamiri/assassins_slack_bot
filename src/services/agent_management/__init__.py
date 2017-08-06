@@ -7,7 +7,7 @@ import boto3
 from db_access import connection
 from services import code_name
 from services.agent_management import sql
-from services.agent_management.data_access import get_assassinated_players
+from services.agent_management import data_access
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -38,8 +38,17 @@ def reset_agents():
         - What are all the current code names
     """
     logger.info('Beginning player reset')
-    assassinated_players = get_assassinated_players()
+    assassinated_players = tuple(data_access.get_assassinated_players())
+
+    if not assassinated_players:
+        logger.info('No players need to be reset')
+        return
+
     new_codenames = code_name.generate_n_codenames(len(assassinated_players))
     data_access.assign_codenames(izip(assassinated_players, new_codenames))
     data_access.revive_assassinated_agents()
     logger.info('Player reset was successful')
+
+
+def get_all_agents():
+    return data_access.get_all()

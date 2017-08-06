@@ -19,12 +19,19 @@ Agent = namedtuple('Agent', (
 ))
 
 
+def get_all():
+    with connection.cursor() as cursor:
+        cursor.execute(sql.GET_ALL_AGENTS)
+        results = cursor.fetchall()
+
+    return (Agent(*row) for row in results)
+
 def get_assassinated_players():
     with connection.cursor() as cursor:
         cursor.execute(sql.GET_ASSASSINATED_PLAYERS)
         results = cursor.fetchall()
 
-    return [Agent(*row) for row in results]
+    return (Agent(*row) for row in results)
 
 
 def assign_codenames(agents_and_codenames):

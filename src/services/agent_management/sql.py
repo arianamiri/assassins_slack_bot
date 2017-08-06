@@ -6,6 +6,11 @@ ADD_PLAYERS = """
 """
 
 
+GET_ALL_AGENTS = """
+    SELECT * FROM `agents`;
+"""
+
+
 GET_ASSASSINATED_PLAYERS = """
     SELECT * FROM `agents` WHERE `is_alive` = 0;
 """
