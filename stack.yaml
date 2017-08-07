@@ -152,17 +152,44 @@ Resources:
       CodeUri: ./target/
       Timeout: 60
       Role: !GetAtt LambdaHandlerRole.Arn
-  CloseContractTopic:
-    Type: AWS::SNS::Topic
+      Environment:
+        Variables:
+          DB_HOST: !GetAtt 'DataStore.Endpoint.Address'
+          DB_PORT: !GetAtt 'DataStore.Endpoint.Port'
+          DB_NAME: assassins
+          DB_USERNAME: SpyMaster
+          DB_PASSWORD: IAmTheBagMan
+  GamePlayApi:
+    Type: AWS::ApiGateway::RestApi
     Properties:
-      DisplayName: 'Closed Contract Channel'
-      Subscription:
-        - Endpoint: !GetAtt CloseContractFunction.Arn
-          Protocol: 'lambda'
+      Name: "Entry point to game play mechanics"
+  CloseContractResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId: !GetAtt GamePlayApi.RootResourceId
+      PathPart: "closeContract"
+      RestApiId: !Ref GamePlayApi
+  CloseContractMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref GamePlayApi
+      ResourceId: !Ref CloseContractResource
+      AuthorizationType: NONE
+      HttpMethod: POST
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${CloseContractFunction.Arn}/invocations
+  GamePlayApiStage:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId: !Ref GamePlayApi
+      StageName: 'v1'
+    DependsOn: CloseContractMethod
   CloseContractPermission:
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
-      Principal: sns.amazonaws.com
-      SourceArn: !Ref CloseContractTopic
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${GamePlayApi}/*
       FunctionName: !GetAtt CloseContractFunction.Arn
