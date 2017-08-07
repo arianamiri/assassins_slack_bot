@@ -36,7 +36,7 @@ def assign_contracts():
         logger.info('possible targets: %s', targets)
 
         if not targets:
-            targets = possible_targets_set
+            targets = possible_target_set
 
         if targets:
             # grab random target

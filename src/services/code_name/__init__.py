@@ -1,4 +1,4 @@
-from db_access import connection
+from utils.db import connection
 from services.code_name.generator import generate_codename
 from services.code_name import sql
 

@@ -1,7 +1,7 @@
 from collections import namedtuple
 import logging
 
-from db_access import connection
+from utils.db import connection
 from services.agent_management import sql
 
 
@@ -25,6 +25,7 @@ def get_all():
         results = cursor.fetchall()
 
     return (Agent(*row) for row in results)
+
 
 def get_assassinated_players():
     with connection.cursor() as cursor:

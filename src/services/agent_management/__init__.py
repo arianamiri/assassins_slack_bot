@@ -4,7 +4,7 @@ import logging
 
 import boto3
 
-from db_access import connection
+from utils.db import connection
 from services import code_name
 from services.agent_management import sql
 from services.agent_management import data_access
@@ -14,9 +14,10 @@ logger.setLevel(logging.INFO)
 
 s3 = boto3.resource('s3')
 
+
 def create_agents(bucket, key):
     logger.info('Loading player data from s3://%s/%s', bucket, key)
-    obj =  s3.Object(bucket_name=bucket, key=key)
+    obj = s3.Object(bucket_name=bucket, key=key)
     lines = obj.get()['Body'].read().split('\n')
     data = [line for line in DictReader(lines)]
 

@@ -1,6 +1,6 @@
 from itertools import groupby
 
-from db_access import connection
+from utils.db import connection
 from services.contract_management import sql
 
 
@@ -12,6 +12,7 @@ def assign_contract(agent_id, target_id, bounty):
             'bounty': bounty
         })
     connection.commit()
+
 
 def assign_multiple_contracts(contract_params):
     with connection.cursor() as cursor:
