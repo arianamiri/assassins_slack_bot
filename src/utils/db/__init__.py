@@ -1,5 +1,6 @@
 import os
 
+from contextlib2 import contextmanager
 import pymysql
 
 
@@ -17,3 +18,13 @@ connection = pymysql.connect(
     user=_DB_USER,
     password=_DB_PASSWORD
 )
+
+
+@contextmanager
+def db_transaction():
+    try:
+        yield
+    except Exception:
+        connection.rollback()
+    else:
+        connection.commit()
