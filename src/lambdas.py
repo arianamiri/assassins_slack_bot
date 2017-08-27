@@ -1,7 +1,5 @@
 import logging
 
-import boto3
-
 from services import agent_management, contract_management
 
 logger = logging.getLogger()
@@ -16,6 +14,7 @@ def create_agents(event, context):
     agent_management.create_agents(bucket, key)
 
     return key, bucket
+
 
 def reset_agents(event, context):
     agent_management.reset_agents()

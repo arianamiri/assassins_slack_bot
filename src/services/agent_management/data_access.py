@@ -62,3 +62,11 @@ def revive_assassinated_agents():
         cursor.execute(sql.REVIVE_ASSASSINATED_AGENTS)
     connection.commit()
     logger.info('Player revival was successful')
+
+
+def get_agents_by_handle(*handles):
+    with connection.cursor() as cursor:
+        cursor.execute(sql.GET_AGENTS_BY_HANDLE, args={'agent_handles': handles})
+        results = cursor.fetchall()
+
+    return (Agent(*row) for row in results)

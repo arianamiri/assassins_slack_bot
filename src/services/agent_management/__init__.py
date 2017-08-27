@@ -53,3 +53,12 @@ def reset_agents():
 
 def get_all_agents():
     return data_access.get_all()
+
+
+def get_agents_by_handle(*handles):
+    handle_to_agent = {
+        agent.handle: agent
+        for agent in data_access.get_agents_by_handle(*handles)
+    }
+
+    return tuple(handle_to_agent[h] for h in handles)

@@ -16,6 +16,11 @@ GET_ASSASSINATED_PLAYERS = """
 """
 
 
+GET_AGENTS_BY_HANDLE = """
+    SELECT * FROM `agents` WHERE `slack_handle` IN %(agent_handles)s;
+"""
+
+
 ASSIGN_CODENAMES_TO_AGENTS = """
     UPDATE `agents`
         SET `code_name` = CASE `id`
