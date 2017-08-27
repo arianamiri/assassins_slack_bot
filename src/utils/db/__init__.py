@@ -1,5 +1,6 @@
 import os
 
+from contextlib2 import ContextDecorator
 import pymysql
 
 
@@ -17,3 +18,14 @@ connection = pymysql.connect(
     user=_DB_USER,
     password=_DB_PASSWORD
 )
+
+
+class managed_transaction(ContextDecorator):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        if exc:
+            connection.rollback()
+        else:
+            connection.commit()

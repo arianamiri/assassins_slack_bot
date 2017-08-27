@@ -26,6 +26,18 @@ ASSIGN_CODENAMES_TO_AGENTS = """
 """
 
 
+GET_AGENTS_BY_HANDLE = """
+    SELECT * FROM `agents` WHERE `handle` IN %(agent_handles)s;
+"""
+
+
+ASSASSINATE_AGENT = """
+    UPDATE `agents`
+        SET `is_alive` = 0
+    WHERE `slack_handle` = %(agent_id)s;
+"""
+
+
 REVIVE_ASSASSINATED_AGENTS = """
     UPDATE `agents`
         SET `is_alive` = 1

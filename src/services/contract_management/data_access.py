@@ -1,7 +1,18 @@
+from collections import namedtuple
 from itertools import groupby
 
 from utils.db import connection
 from services.contract_management import sql
+
+
+Contract = namedtuple('Contract', (
+    'id',
+    'owner_id',
+    'target_id',
+    'bounty',
+    'is_open',
+    'is_successful'
+))
 
 
 def assign_contract(agent_id, target_id, bounty):
@@ -37,3 +48,40 @@ def get_current_max_bounty():
         results = cursor.fetchone()
 
     return results[0]
+
+
+def is_contract_valid(agent_handle, target_handle, code_name):
+    with connection.cursor() as cursor:
+        count = cursor.execute(sql.CONTRACT_VALIDATION, args={
+            'owner_handle': agent_handle,
+            'target_handle': target_handle,
+            'code_name': code_name
+        })
+
+    return bool(count)
+
+
+def fail_contracts(contract_ids):
+    with connection.cursor() as cursor:
+        cursor.execute(sql.FAIL_CONTRACTS_BY_ID, args={
+            'contract_ids': list(contract_ids)
+        })
+
+
+def succeed_contract(contract_id):
+    with connection.cursor() as cursor:
+        cursor.execute(sql.SUCCEED_CONTRACT_BY_ID, args={
+            'contract_id': contract_id
+        })
+
+
+def get_open_contracts_for_agent(agent):
+    with connection.cursor() as cursor:
+        cursor.execute(
+            sql.GET_OPEN_CONTRACTS_FOR_AGENT,
+            args={'agent_id': agent.id}
+        )
+
+        results = cursor.fetchall()
+
+    return (Contract(*row) for row in results)

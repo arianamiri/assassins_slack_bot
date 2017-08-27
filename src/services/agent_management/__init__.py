@@ -53,3 +53,16 @@ def reset_agents():
 
 def get_all_agents():
     return data_access.get_all()
+
+
+def get_agents_by_handles(*agent_handles):
+    handle_to_agent = {
+        agent.slack_handle: agent
+        for agent in data_access.get_agents_by_handles(*agent_handles)
+    }
+
+    return tuple(handle_to_agent[handle] for handle in agent_handles)
+
+
+def assassinate_agent(agent):
+    data_access.assassinate_agent(agent)

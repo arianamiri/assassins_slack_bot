@@ -1,3 +1,4 @@
+from itertools import ifilter, tee
 import logging
 import random
 
@@ -51,6 +52,54 @@ def assign_contracts():
             all_agent_ids.discard(target)
 
     data_access.assign_multiple_contracts(contract_params=contract_params)
+
+
+def is_contract_valid(agent_handle, target_handle, code_name):
+    return data_access.is_contract_valid(
+        agent_handle,
+        target_handle,
+        code_name
+    )
+
+
+def get_open_contracts_for_agent(agent):
+    """ returns open contracts where the specified agent is either the target or the owner """
+    contracts = tee(data_access.get_open_contracts_for_agent(agent), n=2)
+
+    agents_contracts = ifilter(lambda c: c.owner_id == agent.id, contracts[0])
+    contracts_against_agent = ifilter(lambda c: c.target_id == agent.id, contracts[1])
+
+    return agents_contracts, contracts_against_agent
+
+
+def transfer_contracts_to_agent(contracts, agent):
+    """ Takes the contracts  """
+    new_contract_parameters = []
+    existing_contract_ids = []
+
+    for contract in contracts:
+        existing_contract_ids.append(contract.id)
+        new_contract_parameters.append({
+            'agent_id': agent.id,
+            'target_id': contract.target_id,
+            'bounty': contract.bounty
+        })
+
+    # close the contracts that already exist
+    data_access.fail_contracts(existing_contract_ids)
+    # assign new contracts to the agent
+    data_access.assign_multiple_contracts(new_contract_parameters)
+    # TODO NOTIFY THE AGENT THAT THEY HAVE NEW CONTRACTS
+
+
+def close_contract_successfully(contract):
+    data_access.succeed_contract(contract.id)
+
+
+def fail_contracts(contracts):
+    contract_ids = [c.id for c in contracts]
+    data_access.fail_contracts(contract_ids)
+    # TODO NOTIFY THE AGENT THAT THEIR CONTRACT CLOSED
 
 
 def _get_valid_targets():
