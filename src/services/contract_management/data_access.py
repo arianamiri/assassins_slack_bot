@@ -37,3 +37,14 @@ def get_current_max_bounty():
         results = cursor.fetchone()
 
     return results[0]
+
+
+def is_contract_valid(agent_id, target_id, code_name):
+    with connection.cursor() as cursor:
+        count = cursor.execute(sql.VALIDATE_CONTRACT, args={
+            'owner_id': agent_id,
+            'target_id': target_id,
+            'code_name': code_name
+        })
+
+    return bool(count)

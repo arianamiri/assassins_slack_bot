@@ -15,12 +15,10 @@ def close_contract(event, context):
     target = payload.get('target_handle')
     code_name = payload.get('code_name')
 
-    debug = gameplay.close_contract(agent, target, code_name)
-
-    debug = '   '.join(debug)
+    x = str(gameplay.close_contract(agent, target, code_name))
 
     return {
         "statusCode": 202,
         "headers": {},
-        "body": debug
+        "body": x
     }

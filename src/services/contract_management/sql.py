@@ -28,3 +28,16 @@ GET_AVAILABLE_TARGETS_FOR_ALL_AGENTS = """
 GET_MAX_BOUNTY = """
     SELECT max(`bounty`) from `contracts`;
 """
+
+
+VALIDATE_CONTRACT = """
+    SELECT 1
+    FROM contracts
+        JOIN agents owner ON contracts.owner_id = owner.id
+        JOIN agents target ON contracts.target_id = target.id
+    WHERE owner.is_alive = 1
+        AND target.is_alive = 1
+        AND owner.id = %(owner_id)s
+        AND target.id = %(target_id)s
+        AND target.code_name = %(code_name)s;
+"""

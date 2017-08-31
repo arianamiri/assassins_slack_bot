@@ -53,6 +53,10 @@ def assign_contracts():
     data_access.assign_multiple_contracts(contract_params=contract_params)
 
 
+def is_contract_valid(assassin, deceased_agent, code_name):
+    return data_access.is_contract_valid(assassin.id, deceased_agent.id, code_name)
+
+
 def _get_valid_targets():
     return data_access.get_available_targets_lookup()
 
