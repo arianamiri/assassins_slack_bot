@@ -57,6 +57,10 @@ def is_contract_valid(assassin, deceased_agent, code_name):
     return data_access.is_contract_valid(assassin.id, deceased_agent.id, code_name)
 
 
+def payout_contract(contract):
+    data_access.payout_contract(contract.id)
+
+
 def _get_valid_targets():
     return data_access.get_available_targets_lookup()
 

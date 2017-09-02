@@ -1,7 +1,11 @@
+from collections import namedtuple
 from itertools import groupby
 
 from utils.db import connection
 from services.contract_management import sql
+
+
+Contract = namedtuple('Contract', ('id', 'owner_id', 'target_id', 'bounty', 'is_open', 'is_successful'))
 
 
 def assign_contract(agent_id, target_id, bounty):
@@ -47,4 +51,20 @@ def is_contract_valid(agent_id, target_id, code_name):
             'code_name': code_name
         })
 
-    return bool(count)
+        if count:
+            contract = Contract(*cursor.fetchone())
+        else:
+            contract = None
+
+    return contract
+
+
+def payout_contract(contract_id):
+    """
+    Successfully closes a contract.
+    Requires caller to handle transaction management.
+    """
+    with connection.cursor() as cursor:
+        cursor.execute(sql.PAYOUT_CONTRACT, args={
+            'contract_id': contract_id
+        })

@@ -31,7 +31,7 @@ GET_MAX_BOUNTY = """
 
 
 VALIDATE_CONTRACT = """
-    SELECT 1
+    SELECT contracts.*
     FROM contracts
         JOIN agents owner ON contracts.owner_id = owner.id
         JOIN agents target ON contracts.target_id = target.id
@@ -41,3 +41,13 @@ VALIDATE_CONTRACT = """
         AND target.id = %(target_id)s
         AND target.code_name = %(code_name)s;
 """
+
+
+PAYOUT_CONTRACT = """
+    UPDATE contracts
+    SET
+        is_open = 0,
+        is_successful = 1
+    WHERE id = %(contract_id)s;
+"""
+
