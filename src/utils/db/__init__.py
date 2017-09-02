@@ -1,7 +1,11 @@
+import logging
 import os
 
 from contextlib2 import contextmanager
 import pymysql
+
+
+logger = logging.getLogger()
 
 
 _DB_HOST = os.environ['DB_HOST']

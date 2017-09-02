@@ -58,7 +58,22 @@ def is_contract_valid(assassin, deceased_agent, code_name):
 
 
 def payout_contract(contract):
+    logger.info('Paying out contract with id %s', contract.id)
+    # TODO notify owner of payout
     data_access.payout_contract(contract.id)
+
+
+def cancel_contracts(*contracts):
+    logger.info('Cancelling contracts')
+    # TODO notify owner of cancellation
+    data_access.cancel_contracts(*(c.id for c in contracts))
+
+
+def get_contracts_against_agent(agent):
+    """
+    Returns all contracts that are open against the specified agent
+    """
+    return data_access.get_open_contracts_against_agent(agent.id)
 
 
 def _get_valid_targets():

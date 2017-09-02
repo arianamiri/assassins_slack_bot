@@ -11,6 +11,16 @@ GET_CURRENT_CONTRACTS_FOR_AGENT = """
 """
 
 
+GET_OPEN_CONTRACTS_AGAINST_AGENT = """
+    SELECT
+        *
+    FROM `contracts`
+    WHERE
+        `target_id` = %(target_id)s
+        AND `is_open` = 1;
+"""
+
+
 GET_AVAILABLE_TARGETS_FOR_ALL_AGENTS = """
     SELECT
       asignee.id,
@@ -51,3 +61,11 @@ PAYOUT_CONTRACT = """
     WHERE id = %(contract_id)s;
 """
 
+
+CANCEL_MULTIPLE_CONTRACTS = """
+    UPDATE contracts
+    SET
+        is_open = 0,
+        is_successful = 0
+    WHERE id IN %(contract_ids)s;
+"""

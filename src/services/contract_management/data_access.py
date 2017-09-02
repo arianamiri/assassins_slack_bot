@@ -1,8 +1,12 @@
+import logging
 from collections import namedtuple
 from itertools import groupby
 
 from utils.db import connection
 from services.contract_management import sql
+
+
+logger = logging.getLogger()
 
 
 Contract = namedtuple('Contract', ('id', 'owner_id', 'target_id', 'bounty', 'is_open', 'is_successful'))
@@ -68,3 +72,21 @@ def payout_contract(contract_id):
         cursor.execute(sql.PAYOUT_CONTRACT, args={
             'contract_id': contract_id
         })
+
+
+def cancel_contracts(*contract_ids):
+    """
+    Fails multiple contracts.
+    Requires caller to handle transaction management.
+    """
+    logger.info('Cancelling contracts with ids: %s', contract_ids)
+    with connection.cursor() as cursor:
+        cursor.execute(sql.CANCEL_MULTIPLE_CONTRACTS, args={
+            'contract_ids': contract_ids
+        })
+
+
+def get_open_contracts_against_agent(agent_id):
+    with connection.cursor() as cursor:
+        cursor.execute(sql.GET_OPEN_CONTRACTS_AGAINST_AGENT, args={'target_id': agent_id})
+    return (Contract(*row) for row in cursor.fetchall())
