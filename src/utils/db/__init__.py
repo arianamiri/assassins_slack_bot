@@ -24,11 +24,14 @@ connection = pymysql.connect(
 )
 
 
+# TODO RAISE EXCEPTIONS AFTER A ROLLBACK
 @contextmanager
 def db_transaction():
     try:
         yield
     except Exception:
+        logger.exception('Encountered an error during a managed transaction.  Rolling back all transactions.')
         connection.rollback()
     else:
+        logger.debug('Managed transaction succeeded.')
         connection.commit()
