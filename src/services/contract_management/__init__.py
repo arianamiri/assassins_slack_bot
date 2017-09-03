@@ -27,20 +27,21 @@ def assign_contracts():
     max_bounty = _get_max_bounty()
 
     contract_params = []
-    for agent_id, possible_target_set in valid_target_lookup.iteritems():
+    for agent_id, possible_target_list in valid_target_lookup.iteritems():
         logger.info('assigning contract to %s', agent_id)
 
         # get a set of users who have not been assigned as a target in this round
         # and are in the user's set of valid targets
-        targets = possible_target_set.intersection(all_agent_ids)
+        targets = all_agent_ids.intersection(possible_target_list)
         logger.info('possible targets: %s', targets)
 
         if not targets:
-            targets = possible_target_set
+            targets = possible_target_list
 
         if targets:
+            targets = list(targets)
             # grab random target
-            target = targets.pop()
+            target = random.choice(targets)
 
             contract_params.append({
                 'target_id': target,

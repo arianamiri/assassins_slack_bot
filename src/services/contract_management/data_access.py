@@ -34,7 +34,7 @@ def get_available_targets_lookup():
         results = cursor.fetchall()
 
     return {
-        agent_id: set(pt[1] for pt in possible_targets)
+        agent_id: list(pt[1] for pt in possible_targets)
         for agent_id, possible_targets in groupby(results, key=lambda x: x[0])
     }
 
