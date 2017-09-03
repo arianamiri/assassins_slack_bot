@@ -25,6 +25,13 @@ def close_contract(agent_handle, target_handle, code_name):
         # they were cancelled.
         contracts_to_cancel = contract_management.get_contracts_against_agent(deceased_agent)
         contract_management.cancel_contracts(*contracts_to_cancel)
+
+        # Transfer all open contracts from deceased agent to the the assassin
+        # NOTE: similar to contract cancellations, we probably could have done
+        # this in a single db transaction but are doing this in 2 queries so we
+        # can notify the user
+        contracts_to_transfer = contract_management.get_transferable_contracts(deceased_agent, assassin)
+        contract_management.transfer_contracts(assassin, contracts_to_transfer)
         return True
     else:
         # TODO NOTIFY THE USER THAT HIS CONTRACT IS NOT VALID.

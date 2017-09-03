@@ -20,7 +20,6 @@ CREATE TABLE `contracts` (
   `is_open` tinyint(4) NOT NULL DEFAULT '1',
   `is_successful` tinyint(4) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `owner_target_unique` (`owner_id`,`target_id`),
   KEY `target_id` (`target_id`),
   CONSTRAINT `contracts_ibfk_1` FOREIGN KEY (`owner_id`) REFERENCES `agents` (`id`),
   CONSTRAINT `contracts_ibfk_2` FOREIGN KEY (`target_id`) REFERENCES `agents` (`id`)

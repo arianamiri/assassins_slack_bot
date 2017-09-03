@@ -69,3 +69,26 @@ CANCEL_MULTIPLE_CONTRACTS = """
         is_successful = 0
     WHERE id IN %(contract_ids)s;
 """
+
+
+GET_TRANFERABLE_CONTRACTS = """
+    SELECT a.*
+    FROM contracts a
+    WHERE a.is_open = 1
+          AND a.owner_id = %(from_agent_id)s
+          AND a.target_id != %(to_agent_id)s
+          AND NOT EXISTS(SELECT 1
+                          FROM contracts b
+                         WHERE b.is_open = 1
+                          AND b.owner_id = %(to_agent_id)s
+                          AND b.target_id = a.target_id);
+"""
+
+
+TRANSER_CONTRACTS_TO_AGENT = """
+    UPDATE contracts
+        SET
+            owner_id = %(new_owner_id)s
+        WHERE
+            id in %(contract_ids)s;
+"""

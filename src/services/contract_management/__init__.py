@@ -64,9 +64,10 @@ def payout_contract(contract):
 
 
 def cancel_contracts(*contracts):
-    logger.info('Cancelling contracts')
-    # TODO notify owner of cancellation
-    data_access.cancel_contracts(*(c.id for c in contracts))
+    if contracts:
+        logger.info('Cancelling contracts')
+        # TODO notify owner of cancellation
+        data_access.cancel_contracts(*(c.id for c in contracts))
 
 
 def get_contracts_against_agent(agent):
@@ -74,6 +75,15 @@ def get_contracts_against_agent(agent):
     Returns all contracts that are open against the specified agent
     """
     return data_access.get_open_contracts_against_agent(agent.id)
+
+
+def get_transferable_contracts(from_agent, to_agent):
+    return data_access.get_transferable_contracts(from_agent.id, to_agent.id)
+
+
+def transfer_contracts(new_owner, contracts):
+    # TODO notify owner of new contracts
+    data_access.transfer_contracts(new_owner.id, (c.id for c in contracts))
 
 
 def _get_valid_targets():

@@ -86,6 +86,32 @@ def cancel_contracts(*contract_ids):
         })
 
 
+def get_transferable_contracts(from_agent_id, to_agent_id):
+    logger.info('Getting contracts transferable from %s to %s', from_agent_id, to_agent_id)
+    with connection.cursor() as cursor:
+        cursor.execute(sql.GET_TRANFERABLE_CONTRACTS, args={
+            'from_agent_id': from_agent_id,
+            'to_agent_id': to_agent_id
+        })
+
+        results = cursor.fetchall()
+
+    return (Contract(*row) for row in results)
+
+
+def transfer_contracts(new_owner_id, contract_ids):
+    """
+    Updates contracts specified by contract_id so that the owner references new_owner_id.
+    Requires caller to handle transaction management.
+    """
+    logger.info('transferring contracts %s to agent %s', contract_ids, new_owner_id)
+    with connection.cursor() as cursor:
+        cursor.execute(sql.TRANSER_CONTRACTS_TO_AGENT, args={
+            'new_owner_id': new_owner_id,
+            'contract_ids': tuple(contract_ids)
+        })
+
+
 def get_open_contracts_against_agent(agent_id):
     with connection.cursor() as cursor:
         cursor.execute(sql.GET_OPEN_CONTRACTS_AGAINST_AGENT, args={'target_id': agent_id})
