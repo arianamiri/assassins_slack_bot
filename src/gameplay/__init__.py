@@ -11,8 +11,8 @@ logger = logging.getLogger()
 @db_transaction()
 def close_contract(agent_handle, target_handle, code_name):
     logger.info('Processing request to close contract')
-    assassin, deceased_agent = agent_management.get_agents_by_handle(agent_handle, target_handle)
-    contract = contract_management.is_contract_valid(assassin, deceased_agent, code_name)
+    assassin, dead_agent = agent_management.get_agents_by_handle(agent_handle, target_handle)
+    contract = contract_management.is_contract_valid(assassin, dead_agent, code_name)
 
     if contract:
         logger.info('Valid contract found.')
@@ -23,15 +23,18 @@ def close_contract(agent_handle, target_handle, code_name):
         # NOTE: We could have closed all contracts against the agent in a single query,
         # but we are doing it in 2 so that we can notify the owners of the contracts that
         # they were cancelled.
-        contracts_to_cancel = contract_management.get_contracts_against_agent(deceased_agent)
+        contracts_to_cancel = contract_management.get_contracts_against_agent(dead_agent)
         contract_management.cancel_contracts(*contracts_to_cancel)
 
         # Transfer all open contracts from deceased agent to the the assassin
         # NOTE: similar to contract cancellations, we probably could have done
         # this in a single db transaction but are doing this in 2 queries so we
         # can notify the user
-        contracts_to_transfer = contract_management.get_transferable_contracts(deceased_agent, assassin)
+        contracts_to_transfer = contract_management.get_transferable_contracts(dead_agent, assassin)
         contract_management.transfer_contracts(assassin, contracts_to_transfer)
+
+        # Finally assassinate the agent
+        agent_management.assassinate_agent(dead_agent)
         return True
     else:
         # TODO NOTIFY THE USER THAT HIS CONTRACT IS NOT VALID.

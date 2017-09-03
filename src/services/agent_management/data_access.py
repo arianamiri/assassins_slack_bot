@@ -70,3 +70,10 @@ def get_agents_by_handle(*handles):
         results = cursor.fetchall()
 
     return (Agent(*row) for row in results)
+
+
+def assassinate_agent(agent_id):
+    with connection.cursor() as cursor:
+        cursor.execute(sql.ASSASSINATE_AGENT, args={
+            'agent_id': agent_id
+        })

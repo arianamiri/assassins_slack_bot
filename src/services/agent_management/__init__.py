@@ -52,13 +52,26 @@ def reset_agents():
 
 
 def get_all_agents():
+    """
+    Return all agents in the game
+    """
     return data_access.get_all()
 
 
 def get_agents_by_handle(*handles):
+    """
+    For the handles passed in, return Agent objects.
+    """
     handle_to_agent = {
         agent.handle: agent
         for agent in data_access.get_agents_by_handle(*handles)
     }
 
     return tuple(handle_to_agent[h] for h in handles)
+
+def assassinate_agent(agent):
+    """
+    Assassinate an agent.
+    """
+    # TODO notify the user that they've been assassinated
+    data_access.assassinate_agent(agent.id)

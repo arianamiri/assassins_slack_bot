@@ -36,3 +36,10 @@ REVIVE_ASSASSINATED_AGENTS = """
         SET `is_alive` = 1
     WHERE `is_alive` = 0
 """
+
+
+ASSASSINATE_AGENT = """
+    UPDATE `agents`
+        SET `is_alive` = 0
+    WHERE `id` = %(agent_id)s;
+"""
