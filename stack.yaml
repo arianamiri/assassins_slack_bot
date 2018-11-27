@@ -8,31 +8,18 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: 'VPC created by cf'
+          Value: 'VPC assassins slack bot'
   InternetGateway:
     Type: AWS::EC2::InternetGateway
     Properties:
       Tags:
       - Key: Name
-        Value: Created By CF
+        Value: Slack Assasins IGW
   VPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       VpcId: !Ref Vpc
       InternetGatewayId: !Ref InternetGateway
-  DataStoreSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: Open database for access
-      VpcId: !Ref Vpc
-  DSSGIngressRule:
-    Type: AWS::EC2::SecurityGroupIngress
-    Properties:
-      CidrIp: '0.0.0.0/0'
-      FromPort: '3306'
-      ToPort: '3306'
-      GroupId: !Ref DataStoreSecurityGroup
-      IpProtocol: tcp
   PublicSubnet1:
     Type: AWS::EC2::Subnet
     Properties:
@@ -71,76 +58,40 @@ Resources:
       RouteTableId: !Ref RouteTable
       DestinationCidrBlock: 0.0.0.0/0
       GatewayId: !Ref InternetGateway
-  DataStoreSubtNetGroup:
-    Type: AWS::RDS::DBSubnetGroup
-    Properties:
-      DBSubnetGroupDescription: Created by CF
-      SubnetIds:
-        - !Ref PublicSubnet1
-        - !Ref PublicSubnet2
-  DataStore:
-    Type: AWS::RDS::DBInstance
-    Properties:
-      AllocatedStorage: '5'
-      DBInstanceClass: db.m1.small
-      DBName: assassins
-      DBSubnetGroupName: !Ref DataStoreSubtNetGroup
-      Engine: MySQL
-      MasterUsername: SpyMaster
-      MasterUserPassword: IAmTheBagMan
-      PubliclyAccessible: true
-      VPCSecurityGroups:
-        - !Ref DataStoreSecurityGroup
-    DeletionPolicy: Snapshot
-  LambdaHandlerRole:
-    Type: AWS::IAM::Role
-    Properties:
-      ManagedPolicyArns:
-        - 'arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole'
-        - 'arn:aws:iam::aws:policy/AmazonS3FullAccess'
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ['lambda.amazonaws.com']
-            Action: ['sts:AssumeRole']
-      Path: /
+
   PlayerLoaderBucket:
     Type: AWS::S3::Bucket
-  PlayerLoaderFunction:
+    Properties:
+      BucketName: !Sub "${AWS::StackName}-player-load-bucket"
+
+  PlayerTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: !Sub "${AWS::StackName}-player-table"
+      PrimaryKey:
+        Name: slack_handle
+        Type: String
+      SSESpecification:
+        SSEEnabled: false
+
+  LoadPlayerTableFn:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: lambdas.create_agents
-      Runtime: python2.7
       CodeUri: ./target/
-      Timeout: 60
-      Role: !GetAtt LambdaHandlerRole.Arn
-      Environment:
-        Variables:
-          DB_HOST: !GetAtt 'DataStore.Endpoint.Address'
-          DB_PORT: !GetAtt 'DataStore.Endpoint.Port'
-          DB_NAME: assassins
-          DB_USERNAME: SpyMaster
-          DB_PASSWORD: IAmTheBagMan
+      Handler: lambdas.create_agents
+      Runtime: python3.6
+      Timeout: 900
       Events:
-        S3ObjectCreatedEvent:
+        PlayerCSVUpload:
           Type: S3
           Properties:
-            Bucket: !Ref PlayerLoaderBucket
-            Events: s3:ObjectCreated:*
-  PlayerRevivalFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: lambdas.reset_agents
-      Runtime: python2.7
-      CodeUri: ./target/
-      Timeout: 60
-      Role: !GetAtt LambdaHandlerRole.Arn
+              Bucket: !Ref PlayerLoaderBucket
+              Events: s3:ObjectCreated:*
       Environment:
         Variables:
-          DB_HOST: !GetAtt 'DataStore.Endpoint.Address'
-          DB_PORT: !GetAtt 'DataStore.Endpoint.Port'
-          DB_NAME: assassins
-          DB_USERNAME: SpyMaster
-          DB_PASSWORD: IAmTheBagMan
+          PLAYER_TABLE: !Ref PlayerTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PlayerTable
+        - S3ReadPolicy:
+            BucketName: "*"
