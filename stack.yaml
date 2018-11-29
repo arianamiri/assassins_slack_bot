@@ -65,14 +65,34 @@ Resources:
       BucketName: !Sub "${AWS::StackName}-player-load-bucket"
 
   PlayerTable:
-    Type: AWS::Serverless::SimpleTable
+    Type: AWS::DynamoDB::Table
     Properties:
+      AttributeDefinitions:
+        - AttributeName: slack_handle
+          AttributeType: S
+        - AttributeName: code_name
+          AttributeType: S
+        - AttributeName: status
+          AttributeType: S
+      GlobalSecondaryIndexes:
+        - IndexName: AgentStatusIndex
+          KeySchema:
+            - AttributeName: status
+              KeyType: HASH
+            - AttributeName: code_name
+              KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
+          ProvisionedThroughput:
+            ReadCapacityUnits:  1
+            WriteCapacityUnits: 1
+      KeySchema:
+        - AttributeName: slack_handle
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
       TableName: !Sub "${AWS::StackName}-player-table"
-      PrimaryKey:
-        Name: slack_handle
-        Type: String
-      SSESpecification:
-        SSEEnabled: false
 
   LoadPlayerTableFn:
     Type: AWS::Serverless::Function
