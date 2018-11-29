@@ -1,16 +1,10 @@
-from db_access import connection
 from services.code_name.generator import generate_codename
-from services.code_name import sql
 
 
 def generate_n_codenames(n):
     new_code_names = set()
-    existing_codenames = set(_get_existing_codenames())
     while len(new_code_names) < n:
-        new_code_name = generate_codename()
-        if new_code_name not in existing_codenames:
-            new_code_names.add(new_code_name)
-
+        new_code_names.add(generate_codename())
     return new_code_names
 
 

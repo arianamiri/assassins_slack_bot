@@ -1,9 +1,10 @@
 import logging
 import os
-
 from csv import DictReader
 
 import boto3
+
+from services.code_name import generate_n_codenames
 
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
@@ -17,6 +18,7 @@ def create_agents(bucket, key):
     obj =  s3.Object(bucket_name=bucket, key=key)
     lines = obj.get()['Body'].read().decode('utf-8').split('\n')
     batch = []
+    code_names = generate_n_codenames(len(lines))
     for line in DictReader(lines):
         if len(batch) == 25:
             _create_agents_batch(batch)
@@ -27,6 +29,7 @@ def create_agents(bucket, key):
                     'Item': {
                         'slack_handle': {'S': line['slack_handle']},
                         'name': {'S': line['agent_name']},
+                        'code_name': {'S': code_names.pop()},
                         'is_alive': {'BOOL': True},
                         'kills': {'N': '0'},
                         'deaths': {'N': '0'}
