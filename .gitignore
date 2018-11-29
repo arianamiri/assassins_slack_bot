@@ -2,3 +2,6 @@ stack-out.yaml
 target/
 venv/
 .tags
+.python-version
+.vscode/
+packaged.yaml
