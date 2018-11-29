@@ -15,8 +15,18 @@ if [ ! -d $VENV_DIR ]; then
   virtualenv venv
 fi
 
-source "$VENV_DIR/bin/activate"
-  pip install -r requirements.txt -t $TARGET_DIR
-deactivate
+# source "$VENV_DIR/bin/activate"
+#   pip install -r requirements.txt -t $TARGET_DIR
+# deactivate
 
 cp -r $SOURCE_DIR $TARGET_DIR
+
+sam package \
+    --template-file stack.yaml \
+    --s3-bucket sag-artifacts \
+    --output-template-file packaged.yaml
+
+sam deploy \
+    --template-file packaged.yaml \
+    --stack-name assassins \
+    --capabilities CAPABILITY_IAM
